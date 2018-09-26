@@ -12,4 +12,19 @@ public class Transaction implements Serializable {
         this.date = date;
         this.amount = amount;
     }
+
+    @Override
+    public String toString() {
+        float a;
+        String type;
+        if (amount > 0) {
+            type = "bought";
+            a = amount;
+        }
+        else {
+            type = "sold";
+            a = -amount;
+        }
+        return Float.toString(a) + " " + type + " on " + Long.toString(date);
+    }
 }

@@ -23,7 +23,11 @@
         <activity
             android:name=".PortfolioActivity"
             android:label="@string/title_activity_portfolio"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".CurrencyActivity"
+            android:label="@string/title_activity_currency"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

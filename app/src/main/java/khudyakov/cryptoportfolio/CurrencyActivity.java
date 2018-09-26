@@ -1,6 +1,5 @@
 package khudyakov.cryptoportfolio;
 
-import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -17,13 +16,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class PortfolioActivity extends AppCompatActivity {
+public class CurrencyActivity extends AppCompatActivity {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -40,13 +37,12 @@ public class PortfolioActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
 
-    static Portfolio portfolio;
-    static int portfolioId;
+    static Currency currency;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_portfolio);
+        setContentView(R.layout.activity_currency);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -72,16 +68,18 @@ public class PortfolioActivity extends AppCompatActivity {
             }
         });
 
-        int id = getIntent().getIntExtra("Id", -1);
-        portfolioId = id;
-        portfolio = App.portfolios.get(id);
+        int portfolioId = getIntent().getIntExtra("Portfolio", -1);
+        int currencyId = getIntent().getIntExtra("Currency", -1);
+        Portfolio portfolio = App.portfolios.get(portfolioId);
+
+        currency = portfolio.getCurrency(currencyId);
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_portfolio, menu);
+        getMenuInflater().inflate(R.menu.menu_currency, menu);
         return true;
     }
 
@@ -128,33 +126,21 @@ public class PortfolioActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-
             View rootView= inflater.inflate(R.layout.overview_layout, container, false);
             switch (getArguments().getInt(ARG_SECTION_NUMBER)) {
                 case 1:
                     rootView = inflater.inflate(R.layout.overview_layout, container, false);
                     TextView costText = rootView.findViewById(R.id.costText);
-                    costText.setText(Float.toString(PortfolioActivity.portfolio.getCost()));
+                    costText.setText(Float.toString(CurrencyActivity.currency.currentCost()));
                     TextView profitText = rootView.findViewById(R.id.profitText);
-                    profitText.setText(Float.toString(PortfolioActivity.portfolio.getProfit()));
+                    profitText.setText(Float.toString(CurrencyActivity.currency.profit()));
                     break;
                 case 2:
-                    rootView = inflater.inflate(R.layout.composition_layout, container, false);
-                    ListView listView = rootView.findViewById(R.id.compositionList);
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
-                            android.R.layout.simple_list_item_1, portfolio.getComposition());
-                    listView.setAdapter(adapter);
-
-                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            Intent intent = new Intent
-                                    (getContext(), CurrencyActivity.class);
-                            intent.putExtra("Portfolio", portfolioId);
-                            intent.putExtra("Currency", position);
-                            startActivity(intent);
-                        }
-                    });
+                    rootView = inflater.inflate(R.layout.transaction_layout, container, false);
+                    ListView transactionsList = rootView.findViewById(R.id.transactionsList);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
+                            android.R.layout.simple_list_item_1, currency.getTransactions());
+                    transactionsList.setAdapter(adapter);
                     break;
             }
 //            View rootView = inflater.inflate(R.layout.fragment_portfolio, container, false);

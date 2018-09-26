@@ -25,10 +25,6 @@ public class Portfolio implements Serializable {
         cost += currency.currentCost();
     }
 
-    TreeMap<String, Float> getComposition() {
-        return composition;
-    }
-
     float getCost() {
         return cost;
     }
@@ -44,5 +40,18 @@ public class Portfolio implements Serializable {
         }
 
         return (sold + cost) / bought - 1;
+    }
+
+    String[] getComposition() {
+        String[] composition = new String[currencies.size()];
+        for (int i = 0; i < composition.length; i++) {
+            String weight = Float.toString(currencies.get(i).currentCost() / cost);
+            composition[i] = currencies.get(i).name + "\t" + weight;
+        }
+        return composition;
+    }
+
+    Currency getCurrency(int index) {
+        return currencies.get(index);
     }
 }

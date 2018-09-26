@@ -61,4 +61,13 @@ public class Currency implements Serializable {
 
         return (sold + currentCost()) / bought - 1;
     }
+
+    String[] getTransactions() {
+        int size = transactions.size();
+        String[] array = new String[size];
+        for (int i = 0; i < size; i++) {
+            array[i] = transactions.get(i).toString();
+        }
+        return array;
+    }
 }
