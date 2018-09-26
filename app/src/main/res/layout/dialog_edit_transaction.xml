@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/editDateLabel"
+        android:text="Date"
+        android:layout_marginTop="80dp"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/editDateLabel"/>
+
+    <EditText
+        android:id="@+id/editDateText"
+        android:hint="Date"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/editDateLabel"
+        app:layout_constraintBottom_toBottomOf="@id/editDateLabel"
+        app:layout_constraintStart_toEndOf="@id/editDateLabel" />
+
+    <TextView
+        android:id="@+id/editAmountLabel"
+        android:text="Amount"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        app:layout_constraintTop_toBottomOf="@id/editDateLabel"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <EditText
+        android:id="@+id/editAmountText"
+        android:hint="Amount"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/editAmountLabel"
+        app:layout_constraintBottom_toBottomOf="@id/editAmountLabel"
+        app:layout_constraintStart_toEndOf="@id/editAmountLabel"  />
+
+</android.support.constraint.ConstraintLayout>

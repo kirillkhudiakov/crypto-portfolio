@@ -1,8 +1,10 @@
 package khudyakov.cryptoportfolio;
 
+import android.content.DialogInterface;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -16,7 +18,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -59,20 +63,38 @@ public class CurrencyActivity extends AppCompatActivity {
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         int portfolioId = getIntent().getIntExtra("Portfolio", -1);
         int currencyId = getIntent().getIntExtra("Currency", -1);
         Portfolio portfolio = App.portfolios.get(portfolioId);
-
         currency = portfolio.getCurrency(currencyId);
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(CurrencyActivity.this);
+                builder.setTitle("Add transaction");
+                final View dialogView = getLayoutInflater().inflate(R.layout.dialog_new_transaction, null);
+
+                builder.setView(dialogView);
+                builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        EditText newDateText = dialogView.findViewById(R.id.newDateText);
+                        EditText newAmountText = dialogView.findViewById(R.id.newAmountText);
+                        long date = Long.parseLong(newDateText.getText().toString());
+                        float amount = Float.parseFloat(newAmountText.getText().toString());
+                        currency.addTransaction(new Transaction(date, amount));
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {}
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
     }
 
 
@@ -124,7 +146,7 @@ public class CurrencyActivity extends AppCompatActivity {
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+        public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView= inflater.inflate(R.layout.overview_layout, container, false);
             switch (getArguments().getInt(ARG_SECTION_NUMBER)) {
@@ -141,6 +163,40 @@ public class CurrencyActivity extends AppCompatActivity {
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                             android.R.layout.simple_list_item_1, currency.getTransactions());
                     transactionsList.setAdapter(adapter);
+
+                    transactionsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                            builder.setTitle("Edit transaction");
+
+                            final Transaction transaction = currency.transactions.get(position);
+                            View dialogView = inflater.inflate(R.layout.dialog_edit_transaction, null);
+                            final EditText editAmountText = dialogView.findViewById(R.id.editAmountText);
+                            editAmountText.setText(Float.toString(transaction.amount));
+                            final EditText editDateText = dialogView.findViewById(R.id.editDateText);
+                            editDateText.setText(Long.toString(transaction.date));
+
+                            builder.setView(dialogView);
+                            builder.setPositiveButton(R.string.edit, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    long newDate = Long.parseLong(editDateText.getText().toString());
+                                    float newAmount = Float.parseFloat(editAmountText.getText().toString());
+                                    transaction.amount = newAmount;
+                                    transaction.date = newDate;
+                                }
+                            });
+                            builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    currency.transactions.remove(position);
+                                }
+                            });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                        }
+                    });
                     break;
             }
 //            View rootView = inflater.inflate(R.layout.fragment_portfolio, container, false);
