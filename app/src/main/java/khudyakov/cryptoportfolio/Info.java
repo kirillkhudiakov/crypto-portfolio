@@ -19,24 +19,41 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class Info {
 
-    ArrayList<Timestamp> values;
+    HashMap<String, ArrayList<Timestamp>> quotations;
     Context currentContext;
-    CandleStickChart chart;
+    String[] cryptoTickers;
+    int count;
 
-    public Info(Context context, CandleStickChart chart) {
+    public Info(Context context) {
         currentContext = context;
-        this.chart = chart;
+        quotations = new HashMap<>();
+        cryptoTickers = context.getResources().getStringArray(R.array.crypto_tickers);
     }
 
-    void getInfo() {
+    void setZeroPrices(String ticker) {
+        ArrayList<Timestamp> values = new ArrayList<>(2001);
+        for (long date = 1365120000; date <= 1537920000; date += 86400) {
+            values.add(new Timestamp(date, 0, 0, 0, 0));
+        }
+        quotations.put(ticker, values);
+    }
+
+    void updateQuotations(String ticker) {
         RequestQueue queue = Volley.newRequestQueue(currentContext);
-        String url = "https://min-api.cryptocompare.com/data/histoday?fsym=BTC&tsym=USD&limit=9";
+        getInfo(ticker, queue);
+    }
+
+    void getInfo(final String ticker, RequestQueue queue) {
+        String url = "https://min-api.cryptocompare.com/data/histoday?fsym=" + ticker
+                + "&tsym=USD&limit=2000";
 
         JsonObjectRequest request = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -44,23 +61,23 @@ public class Info {
                     public void onResponse(JSONObject response) {
                         try {
                             JSONArray data = response.getJSONArray("Data");
-                            fillArray(data);
+                            fillArray(ticker, data);
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            Log.d("Kirill", "ERROR");
                         }
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
+                        Log.d("Kirill", "ERROR");
                     }
                 });
 
         queue.add(request);
     }
 
-    void fillArray(JSONArray data) {
-        values = new ArrayList<>(data.length());
+    void fillArray(String ticker, JSONArray data) {
+        ArrayList<Timestamp> values = new ArrayList<>(data.length());
 
         for (int i = 0; i < data.length(); i++) {
             try {
@@ -78,29 +95,26 @@ public class Info {
             }
         }
 
-        getData();
+        quotations.put(ticker, values);
+        count++;
     }
 
-    void getData() {
-        ArrayList<CandleEntry> entries = new ArrayList<>(values.size());
-        ArrayList<String> labels = new ArrayList<>(values.size());
+    TreeMap<Long, Float> getPrices(String ticker) {
+        TreeMap<Long, Float> prices = new TreeMap<>();
+        boolean needToUpdate = false;
+        if (!quotations.containsKey(ticker)) {
+            needToUpdate = true;
+            setZeroPrices(ticker);
+        }
+        ArrayList<Timestamp> timestamps = quotations.get(ticker);
 
-        for (int i = 0; i < values.size(); i++) {
-            entries.add(new CandleEntry(i, values.get(i).high, values.get(i).low,
-                    values.get(i).open, values.get(i).close));
-            labels.add(Integer.toString(i));
+        for (Timestamp timestamp: timestamps) {
+            prices.put(timestamp.date, timestamp.middlePrice());
         }
 
-        CandleDataSet dataSet = new CandleDataSet(entries, "BTC price");
-        dataSet.setColors(ColorTemplate.COLORFUL_COLORS);
-        CandleData data = new CandleData(dataSet);
-        chart.setData(data);
-    }
+        if (needToUpdate)
+            updateQuotations(ticker);
 
-    static TreeMap<Long, Float> getQuotations() {
-        TreeMap<Long, Float> quotations = new TreeMap<>();
-        quotations.put(1532995200L, 1F);
-        quotations.put(1532999200L, 3F);
-        return quotations;
+        return prices;
     }
 }

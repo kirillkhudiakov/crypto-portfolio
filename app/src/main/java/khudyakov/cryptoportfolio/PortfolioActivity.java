@@ -1,9 +1,10 @@
 package khudyakov.cryptoportfolio;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -21,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 public class PortfolioActivity extends AppCompatActivity {
@@ -63,18 +65,38 @@ public class PortfolioActivity extends AppCompatActivity {
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
+        int id = getIntent().getIntExtra("Id", -1);
+        portfolioId = id;
+        portfolio = App.portfolios.get(id);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                AlertDialog.Builder builder = new AlertDialog.Builder(PortfolioActivity.this);
+                builder.setTitle("Add transaction");
+                final View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_currency, null);
+                final Spinner spinner = dialogView.findViewById(R.id.spinner);
+                ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource
+                        (PortfolioActivity.this, R.array.crypto_tickers, android.R.layout.simple_spinner_item);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner.setAdapter(adapter);
+                builder.setView(dialogView);
+                builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String name = spinner.getSelectedItem().toString();
+                        portfolio.addCurrency(new Currency(name, App.info));
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {}
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
-
-        int id = getIntent().getIntExtra("Id", -1);
-        portfolioId = id;
-        portfolio = App.portfolios.get(id);
     }
 
 

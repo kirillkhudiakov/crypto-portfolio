@@ -9,4 +9,20 @@
     <string name="title_activity_currency">CurrencyActivity</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+
+    <string-array name="crypto_tickers">
+        <item>BTC</item>
+        <item>ETH</item>
+        <item>XRP</item>
+        <item>BCH</item>
+        <item>EOS</item>
+        <item>XLM</item>
+        <item>LTC</item>
+        <item>USDT</item>
+        <item>ADA</item>
+        <item>XMR</item>
+        <item>DASH</item>
+        <item>MIOTA</item>
+        <item>TRX</item>
+    </string-array>
 </resources>

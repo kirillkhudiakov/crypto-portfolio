@@ -4,8 +4,6 @@ import android.util.Pair;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.TreeMap;
 
 public class Currency implements Serializable {
@@ -14,10 +12,10 @@ public class Currency implements Serializable {
     ArrayList<Transaction> transactions;
     TreeMap<Long, Float> quotations;
 
-    public Currency(String name) {
+    public Currency(String name, Info info) {
         this.name = name;
         transactions = new ArrayList<>();
-        quotations = Info.getQuotations();
+        quotations = info.getPrices(name);
     }
 
     void addTransaction(Transaction transaction) {
