@@ -45,8 +45,9 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                int id = view.getId();
-                Intent intent = new Intent(MainActivity.this);
+                Intent intent = new Intent(MainActivity.this, PortfolioActivity.class);
+                intent.putExtra("Id", position);
+                startActivity(intent);
             }
         });
     }

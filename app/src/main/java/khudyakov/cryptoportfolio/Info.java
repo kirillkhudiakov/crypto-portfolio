@@ -20,6 +20,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class Info {
 
@@ -93,5 +95,12 @@ public class Info {
         dataSet.setColors(ColorTemplate.COLORFUL_COLORS);
         CandleData data = new CandleData(dataSet);
         chart.setData(data);
+    }
+
+    static TreeMap<Long, Float> getQuotations() {
+        TreeMap<Long, Float> quotations = new TreeMap<>();
+        quotations.put(1532995200L, 1F);
+        quotations.put(1532999200L, 3F);
+        return quotations;
     }
 }

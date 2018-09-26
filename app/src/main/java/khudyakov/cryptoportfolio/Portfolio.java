@@ -14,6 +14,8 @@ public class Portfolio implements Serializable {
     float cost;
 
     public Portfolio(String name) {
+        currencies = new ArrayList<>();
+        composition = new TreeMap<>();
         this.name = name;
     }
 

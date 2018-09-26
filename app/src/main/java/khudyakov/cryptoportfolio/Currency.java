@@ -17,6 +17,7 @@ public class Currency implements Serializable {
     public Currency(String name) {
         this.name = name;
         transactions = new ArrayList<>();
+        quotations = Info.getQuotations();
     }
 
     void addTransaction(Transaction transaction) {
