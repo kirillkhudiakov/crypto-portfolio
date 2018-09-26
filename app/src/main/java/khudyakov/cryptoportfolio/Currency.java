@@ -31,7 +31,7 @@ public class Currency implements Serializable {
     }
 
     float currentCost() {
-        return currentAmount() * quotations.lastEntry().getValue();
+        return currentAmount() * App.info.getPrices(name).lastEntry().getValue();
     }
 
     Pair<Float, Float> boughtAndSold() {
@@ -40,7 +40,7 @@ public class Currency implements Serializable {
 
         for (Transaction transaction: transactions) {
             float amount = transaction.amount;
-            float cost = amount * quotations.get(transaction.date);
+            float cost = amount * App.info.getPrices(name).get(transaction.date);
 
             if (amount > 0)
                 bought += cost;

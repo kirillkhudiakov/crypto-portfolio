@@ -65,7 +65,7 @@ public class CurrencyActivity extends AppCompatActivity {
 
         int portfolioId = getIntent().getIntExtra("Portfolio", -1);
         int currencyId = getIntent().getIntExtra("Currency", -1);
-        Portfolio portfolio = App.portfolios.get(portfolioId);
+        Portfolio portfolio = MainActivity.portfolios.get(portfolioId);
         currency = portfolio.getCurrency(currencyId);
 
         FloatingActionButton fab = findViewById(R.id.fab);

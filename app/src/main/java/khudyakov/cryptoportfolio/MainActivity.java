@@ -13,7 +13,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
+
+    static ArrayList<Portfolio> portfolios;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,13 +36,35 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        portfolios = new ArrayList<>();
+        Currency btc = new Currency("BTC", App.info);
+        btc.addTransaction(new Transaction(1532995200, 1));
+        Currency eth = new Currency("ETH", App.info);
+        eth.addTransaction(new Transaction(1532995200, 1));
+        eth.addTransaction(new Transaction(1532995200, 1));
+
+        Portfolio portfolio1 = new Portfolio("Kotleta1");
+        portfolio1.addCurrency(btc);
+        portfolio1.addCurrency(eth);
+
+        portfolios.add(portfolio1);
+
         fill();
+    }
+
+    static String[] portfoliosNames() {
+        int size = portfolios.size();
+        String[] names = new String[size];
+        for (int i = 0; i < size; i++) {
+            names[i] = portfolios.get(i).name;
+        }
+        return names;
     }
 
     void fill() {
         ListView listView = findViewById(R.id.list_view);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, App.portfoliosNames());
+                android.R.layout.simple_list_item_1, portfoliosNames());
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

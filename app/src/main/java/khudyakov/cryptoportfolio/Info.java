@@ -38,6 +38,10 @@ public class Info {
         cryptoTickers = context.getResources().getStringArray(R.array.crypto_tickers);
     }
 
+    boolean ready() {
+        return count == cryptoTickers.length;
+    }
+
     void setZeroPrices(String ticker) {
         ArrayList<Timestamp> values = new ArrayList<>(2001);
         for (long date = 1365120000; date <= 1537920000; date += 86400) {
@@ -46,9 +50,12 @@ public class Info {
         quotations.put(ticker, values);
     }
 
-    void updateQuotations(String ticker) {
-        RequestQueue queue = Volley.newRequestQueue(currentContext);
-        getInfo(ticker, queue);
+    void updateQuotations() {
+        count = 0;
+        for (String ticker: cryptoTickers) {
+            RequestQueue queue = Volley.newRequestQueue(currentContext);
+            getInfo(ticker, queue);
+        }
     }
 
     void getInfo(final String ticker, RequestQueue queue) {
@@ -101,19 +108,11 @@ public class Info {
 
     TreeMap<Long, Float> getPrices(String ticker) {
         TreeMap<Long, Float> prices = new TreeMap<>();
-        boolean needToUpdate = false;
-        if (!quotations.containsKey(ticker)) {
-            needToUpdate = true;
-            setZeroPrices(ticker);
-        }
         ArrayList<Timestamp> timestamps = quotations.get(ticker);
 
         for (Timestamp timestamp: timestamps) {
             prices.put(timestamp.date, timestamp.middlePrice());
         }
-
-        if (needToUpdate)
-            updateQuotations(ticker);
 
         return prices;
     }

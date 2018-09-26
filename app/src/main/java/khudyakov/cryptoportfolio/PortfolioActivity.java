@@ -67,7 +67,7 @@ public class PortfolioActivity extends AppCompatActivity {
 
         int id = getIntent().getIntExtra("Id", -1);
         portfolioId = id;
-        portfolio = App.portfolios.get(id);
+        portfolio = MainActivity.portfolios.get(id);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
