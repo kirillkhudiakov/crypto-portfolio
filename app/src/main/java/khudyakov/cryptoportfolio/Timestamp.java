@@ -2,6 +2,8 @@ package khudyakov.cryptoportfolio;
 
 import android.util.Log;
 
+import com.github.mikephil.charting.data.CandleEntry;
+
 import java.util.Date;
 
 public class Timestamp {
@@ -22,5 +24,9 @@ public class Timestamp {
 
     float middlePrice() {
         return (high + low + open + close) / 4;
+    }
+
+    CandleEntry toCandleEntry(int index) {
+        return new CandleEntry(index, high, low, open, close);
     }
 }

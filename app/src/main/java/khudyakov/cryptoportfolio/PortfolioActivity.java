@@ -1,5 +1,6 @@
 package khudyakov.cryptoportfolio;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
@@ -13,9 +14,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -24,6 +27,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.utils.ColorTemplate;
+
+import java.util.ArrayList;
 
 public class PortfolioActivity extends AppCompatActivity {
 
@@ -99,6 +110,23 @@ public class PortfolioActivity extends AppCompatActivity {
         });
     }
 
+    static PieChart setupPieChart(Context context) {
+        ArrayList<Currency> currencies = portfolio.currencies;
+        ArrayList<PieEntry> entries = new ArrayList<>(currencies.size());
+        for (Currency currency: currencies) {
+            entries.add(new PieEntry(currency.currentCost(), currency.name));
+        }
+
+        PieDataSet dataSet = new PieDataSet(entries, portfolio.name + " portfolio composition");
+        dataSet.setColors(ColorTemplate.COLORFUL_COLORS);
+        PieData data = new PieData(dataSet);
+
+        PieChart chart = new PieChart(context);
+        chart.setMinimumHeight(1000);
+        chart.setData(data);
+        chart.invalidate();
+        return chart;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -162,6 +190,7 @@ public class PortfolioActivity extends AppCompatActivity {
                     break;
                 case 2:
                     rootView = inflater.inflate(R.layout.composition_layout, container, false);
+
                     ListView listView = rootView.findViewById(R.id.compositionList);
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                             android.R.layout.simple_list_item_1, portfolio.getComposition());
@@ -173,10 +202,11 @@ public class PortfolioActivity extends AppCompatActivity {
                             Intent intent = new Intent
                                     (getContext(), CurrencyActivity.class);
                             intent.putExtra("Portfolio", portfolioId);
-                            intent.putExtra("Currency", position);
+                            intent.putExtra("Currency", position - 1);
                             startActivity(intent);
                         }
                     });
+                    listView.addHeaderView(PortfolioActivity.setupPieChart(getContext()));
                     break;
             }
 //            View rootView = inflater.inflate(R.layout.fragment_portfolio, container, false);

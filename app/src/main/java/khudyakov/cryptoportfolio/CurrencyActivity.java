@@ -1,9 +1,10 @@
 package khudyakov.cryptoportfolio;
 
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,7 +24,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.RadioButton;
+
+import com.github.mikephil.charting.charts.CandleStickChart;
+import com.github.mikephil.charting.data.CandleData;
+import com.github.mikephil.charting.data.CandleDataSet;
+import com.github.mikephil.charting.data.CandleEntry;
+
+import java.util.ArrayList;
 
 public class CurrencyActivity extends AppCompatActivity {
 
@@ -42,6 +51,8 @@ public class CurrencyActivity extends AppCompatActivity {
     private ViewPager mViewPager;
 
     static Currency currency;
+    static CandleStickChart currencyChart;
+    static Period period;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +106,53 @@ public class CurrencyActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
+
+        period = Period.MONTH;
+    }
+
+    public void onRadioButtonClicked(View view) {
+        boolean checked = ((RadioButton) view).isChecked();
+
+        switch (view.getId()) {
+            case R.id.radio_currency_month:
+                if (checked)
+                    period = Period.MONTH;
+                break;
+            case R.id.radio_currency_half_year:
+                if (checked)
+                    period = Period.HALF_YEAR;
+                break;
+            case R.id.radio_currency_year:
+                if (checked)
+                    period = Period.YEAR;
+                break;
+            case R.id.radio_currency_all:
+                if (checked)
+                    period = Period.ALL;
+                break;
+        }
+
+        setupCandleStickChart(view.getRootView().getRootView());
+        currencyChart.notifyDataSetChanged();
+    }
+
+    static void setupCandleStickChart(View rootView) {
+        currencyChart = rootView.findViewById(R.id.currencyChart);
+
+        ArrayList<CandleEntry> entries = currency.getEntries(period);
+        CandleDataSet dataSet = new CandleDataSet(entries, "The Chort");
+        dataSet.setColor(Color.rgb(80, 80, 80));
+        dataSet.setShadowColor(Color.DKGRAY);
+        dataSet.setShadowWidth(0.7f);
+        dataSet.setDecreasingColor(Color.RED);
+        dataSet.setDecreasingPaintStyle(Paint.Style.FILL);
+        dataSet.setIncreasingColor(Color.rgb(122, 242, 84));
+        dataSet.setIncreasingPaintStyle(Paint.Style.STROKE);
+        dataSet.setNeutralColor(Color.BLUE);
+        dataSet.setValueTextColor(Color.RED);
+        CandleData data = new CandleData(dataSet);
+        currencyChart.setData(data);
+        currencyChart.invalidate();
     }
 
 
@@ -151,11 +209,13 @@ public class CurrencyActivity extends AppCompatActivity {
             View rootView= inflater.inflate(R.layout.overview_layout, container, false);
             switch (getArguments().getInt(ARG_SECTION_NUMBER)) {
                 case 1:
-                    rootView = inflater.inflate(R.layout.overview_layout, container, false);
-                    TextView costText = rootView.findViewById(R.id.costText);
-                    costText.setText(Float.toString(CurrencyActivity.currency.currentCost()));
-                    TextView profitText = rootView.findViewById(R.id.profitText);
-                    profitText.setText(Float.toString(CurrencyActivity.currency.profit()));
+                    rootView = inflater.inflate(R.layout.currency_layout, container, false);
+                    CurrencyActivity.setupCandleStickChart(rootView);
+
+//                    TextView costText = rootView.findViewById(R.id.costText);
+//                    costText.setText(Float.toString(CurrencyActivity.currency.currentCost()));
+//                    TextView profitText = rootView.findViewById(R.id.profitText);
+//                    profitText.setText(Float.toString(CurrencyActivity.currency.profit()));
                     break;
                 case 2:
                     rootView = inflater.inflate(R.layout.transaction_layout, container, false);

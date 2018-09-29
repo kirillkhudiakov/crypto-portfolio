@@ -40,12 +40,17 @@ public class MainActivity extends AppCompatActivity {
         Currency btc = new Currency("BTC", App.info);
         btc.addTransaction(new Transaction(1532995200, 1));
         Currency eth = new Currency("ETH", App.info);
-        eth.addTransaction(new Transaction(1532995200, 1));
-        eth.addTransaction(new Transaction(1532995200, 1));
+        eth.addTransaction(new Transaction(1532995200, 2));
+        Currency xrp = new Currency("XRP", App.info);
+        Currency bch = new Currency("BCH", App.info);
+        xrp.addTransaction(new Transaction(1532995200, 5));
+        bch.addTransaction(new Transaction(1532995200, 2));
 
         Portfolio portfolio1 = new Portfolio("Kotleta1");
         portfolio1.addCurrency(btc);
         portfolio1.addCurrency(eth);
+        portfolio1.addCurrency(xrp);
+        portfolio1.addCurrency(bch);
 
         portfolios.add(portfolio1);
 

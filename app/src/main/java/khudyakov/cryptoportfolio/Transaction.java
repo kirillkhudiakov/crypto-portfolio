@@ -1,5 +1,7 @@
 package khudyakov.cryptoportfolio;
 
+import com.github.mikephil.charting.data.CandleEntry;
+
 import java.io.Serializable;
 import java.util.Date;
 
