@@ -4,9 +4,10 @@ import android.util.Log;
 
 import com.github.mikephil.charting.data.CandleEntry;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Timestamp {
+public class Timestamp implements Serializable {
 
     public long date;
     public float high;

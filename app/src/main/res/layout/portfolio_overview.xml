@@ -5,6 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.github.mikephil.charting.charts.CandleStickChart
+        android:id="@+id/portfolioChart"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <TextView
         android:id="@+id/costLabel"
         android:layout_width="100dp"
@@ -12,7 +19,7 @@
         android:layout_marginTop="20dp"
         android:text="Current Cost"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/portfolioChart" />
 
     <TextView
         android:id="@+id/costText"

@@ -3,6 +3,8 @@ package khudyakov.cryptoportfolio;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -14,11 +16,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -28,7 +28,11 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.CandleStickChart;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.CandleData;
+import com.github.mikephil.charting.data.CandleDataSet;
+import com.github.mikephil.charting.data.CandleEntry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
@@ -55,6 +59,7 @@ public class PortfolioActivity extends AppCompatActivity {
 
     static Portfolio portfolio;
     static int portfolioId;
+    static CandleStickChart chart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +90,7 @@ public class PortfolioActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(PortfolioActivity.this);
-                builder.setTitle("Add transaction");
+                builder.setTitle("Add currency");
                 final View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_currency, null);
                 final Spinner spinner = dialogView.findViewById(R.id.spinner);
                 ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource
@@ -98,6 +103,8 @@ public class PortfolioActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         String name = spinner.getSelectedItem().toString();
                         portfolio.addCurrency(new Currency(name, App.info));
+                        SplashActivity.savePortfolios(PortfolioActivity.this);
+                        recreate();
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -108,6 +115,25 @@ public class PortfolioActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
+    }
+
+    static void setupCandleStickChart(View rootView) {
+        chart = rootView.findViewById(R.id.portfolioChart);
+
+        ArrayList<CandleEntry> entries = portfolio.monthEntries();
+        CandleDataSet dataSet = new CandleDataSet(entries, "The Chort");
+        dataSet.setColor(Color.rgb(80, 80, 80));
+        dataSet.setShadowColor(Color.DKGRAY);
+        dataSet.setShadowWidth(0.7f);
+        dataSet.setDecreasingColor(Color.RED);
+        dataSet.setDecreasingPaintStyle(Paint.Style.FILL);
+        dataSet.setIncreasingColor(Color.rgb(122, 242, 84));
+        dataSet.setIncreasingPaintStyle(Paint.Style.STROKE);
+        dataSet.setNeutralColor(Color.BLUE);
+        dataSet.setValueTextColor(Color.RED);
+        CandleData data = new CandleData(dataSet);
+        chart.setData(data);
+        chart.invalidate();
     }
 
     static PieChart setupPieChart(Context context) {
@@ -179,14 +205,21 @@ public class PortfolioActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
 
-            View rootView= inflater.inflate(R.layout.overview_layout, container, false);
+            View rootView= inflater.inflate(R.layout.portfolio_overview, container, false);
+
+            if (portfolio.isEmpty()) {
+                return inflater.inflate(R.layout.empty_porfolio_layout, container, false);
+            }
+
             switch (getArguments().getInt(ARG_SECTION_NUMBER)) {
                 case 1:
-                    rootView = inflater.inflate(R.layout.overview_layout, container, false);
+                    rootView = inflater.inflate(R.layout.portfolio_overview, container, false);
                     TextView costText = rootView.findViewById(R.id.costText);
                     costText.setText(Float.toString(PortfolioActivity.portfolio.getCost()));
                     TextView profitText = rootView.findViewById(R.id.profitText);
                     profitText.setText(Float.toString(PortfolioActivity.portfolio.getProfit()));
+
+                    PortfolioActivity.setupCandleStickChart(rootView);
                     break;
                 case 2:
                     rootView = inflater.inflate(R.layout.composition_layout, container, false);

@@ -19,16 +19,17 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class Info {
+public class Info implements Serializable {
 
     HashMap<String, ArrayList<Timestamp>> quotations;
-    Context currentContext;
+    transient Context currentContext;
     String[] cryptoTickers;
     int count;
 
