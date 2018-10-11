@@ -36,6 +36,20 @@ public class Currency implements Serializable {
         endTime = prices.lastKey();
     }
 
+    void removeTransaction(Transaction transaction) {
+        for (Map.Entry<Long, Float> entry: values.entrySet()) {
+            if (entry.getKey() >= transaction.date) {
+                entry.setValue(entry.getValue() - transaction.amount);
+            }
+        }
+        transactions.remove(transaction);
+    }
+
+    void replaceTransaction(Transaction oldTransaction, Transaction newTransaction) {
+        removeTransaction(oldTransaction);
+        addTransaction(newTransaction);
+    }
+
     void addTransaction(Transaction transaction) {
         transactions.add(transaction);
         for (Map.Entry<Long, Float> entry: values.entrySet()) {
@@ -78,36 +92,46 @@ public class Currency implements Serializable {
     }
 
     float currentAmount() {
-        float amount = 0;
-        for (Transaction transaction : transactions) {
-            amount += transaction.amount;
-        }
-        return amount;
+        return values.lastEntry().getValue();
     }
 
     float currentCost() {
         return currentAmount() * App.info.getPrices(name).lastEntry().getValue();
     }
 
-    Pair<Float, Float> boughtAndSold() {
+    Pair<Float, Float> boughtAndSold(Period period) {
         float bought = 0;
         float sold = 0;
+        long milSecInDay = 24 * 60 * 60;
+        long intermediateTime;
+
+        if (period == Period.MONTH) {
+            intermediateTime = endTime - 30 * milSecInDay;
+        } else if (period == Period.YEAR) {
+            intermediateTime = endTime - 365 * milSecInDay;
+        } else {
+            intermediateTime = -1;
+        }
 
         for (Transaction transaction : transactions) {
             float amount = transaction.amount;
             float cost = amount * App.info.getPrices(name).get(transaction.date);
 
-            if (amount > 0)
+            if (transaction.date < intermediateTime) {
                 bought += cost;
-            else
-                sold += cost;
+            } else {
+                if (amount > 0)
+                    bought += cost;
+                else
+                    sold += cost;
+            }
         }
 
         return new Pair<>(bought, sold);
     }
 
-    float profit() {
-        Pair<Float, Float> summary = boughtAndSold();
+    float profit(Period period) {
+        Pair<Float, Float> summary = boughtAndSold(period);
 
         float bought = summary.first;
         float sold = summary.second;
@@ -220,5 +244,11 @@ public class Currency implements Serializable {
         float low = lowestStamp.low;
 
         return new CandleEntry(x, high, low, open, close);
+    }
+
+    float dailyChange() {
+        float todayPrice = prices.get(endTime);
+        float yesterdayPrice = prices.get(endTime - 24 * 60 * 60);
+        return todayPrice / yesterdayPrice - 1;
     }
 }

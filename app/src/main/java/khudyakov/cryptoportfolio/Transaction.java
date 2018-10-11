@@ -3,6 +3,7 @@ package khudyakov.cryptoportfolio;
 import com.github.mikephil.charting.data.CandleEntry;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Transaction implements Serializable {
@@ -13,6 +14,10 @@ public class Transaction implements Serializable {
     public Transaction(long date, float amount) {
         this.date = date;
         this.amount = amount;
+    }
+
+    Date getDateObject() {
+        return new Date(date * 1000);
     }
 
     @Override
@@ -27,6 +32,8 @@ public class Transaction implements Serializable {
             type = "sold";
             a = -amount;
         }
-        return Float.toString(a) + " " + type + " on " + Long.toString(date);
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        return Float.toString(a) + " " + type + " on " + dateFormat.format(getDateObject());
     }
 }

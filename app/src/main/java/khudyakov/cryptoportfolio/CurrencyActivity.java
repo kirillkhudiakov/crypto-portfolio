@@ -1,5 +1,6 @@
 package khudyakov.cryptoportfolio;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -21,9 +22,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.CandleStickChart;
 import com.github.mikephil.charting.data.CandleData;
@@ -31,6 +35,9 @@ import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class CurrencyActivity extends AppCompatActivity {
 
@@ -52,6 +59,8 @@ public class CurrencyActivity extends AppCompatActivity {
     static Currency currency;
     static CandleStickChart currencyChart;
     static Period period;
+    static Portfolio portfolio;
+    static int portfolioId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,9 +82,9 @@ public class CurrencyActivity extends AppCompatActivity {
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
-        int portfolioId = getIntent().getIntExtra("Portfolio", -1);
+        portfolioId = getIntent().getIntExtra("Portfolio", -1);
         int currencyId = getIntent().getIntExtra("Currency", -1);
-        Portfolio portfolio = MainActivity.portfolios.get(portfolioId);
+        portfolio = MainActivity.portfolios.get(portfolioId);
         currency = portfolio.getCurrency(currencyId);
 
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -85,16 +94,23 @@ public class CurrencyActivity extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(CurrencyActivity.this);
                 builder.setTitle("Add transaction");
                 final View dialogView = getLayoutInflater().inflate(R.layout.dialog_new_transaction, null);
-
                 builder.setView(dialogView);
                 builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        EditText newDateText = dialogView.findViewById(R.id.newDateText);
+                        DatePicker datePicker = dialogView.findViewById(R.id.newDatePicker);
                         EditText newAmountText = dialogView.findViewById(R.id.newAmountText);
-                        long date = Long.parseLong(newDateText.getText().toString());
+                        long date = getUnixTime(datePicker);
                         float amount = Float.parseFloat(newAmountText.getText().toString());
+                        RadioButton sellRadioButton = dialogView.findViewById(R.id.sellRadio);
+                        if (sellRadioButton.isChecked()) {
+                            amount *= -1;
+                        }
+
                         currency.addTransaction(new Transaction(date, amount));
+                        Activity currentActivity = CurrencyActivity.this;
+                        SplashActivity.savePortfolios(currentActivity);
+                        currentActivity.recreate();
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -107,6 +123,16 @@ public class CurrencyActivity extends AppCompatActivity {
         });
 
         period = Period.MONTH;
+    }
+
+    static long getUnixTime(DatePicker datePicker) {
+        int day = datePicker.getDayOfMonth();
+        int month = datePicker.getMonth();
+        int year = datePicker.getYear();
+        TimeZone timeZone = TimeZone.getTimeZone("Etc/GMT");
+        Calendar calendar = Calendar.getInstance(timeZone);
+        calendar.set(year, month, day, 0, 0, 0);
+        return calendar.getTimeInMillis() / 1000;
     }
 
     public void onRadioButtonClicked(View view) {
@@ -205,21 +231,40 @@ public class CurrencyActivity extends AppCompatActivity {
         @Override
         public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView= inflater.inflate(R.layout.portfolio_overview, container, false);
+            View rootView= inflater.inflate(R.layout.portfolio_graph, container, false);
             switch (getArguments().getInt(ARG_SECTION_NUMBER)) {
                 case 1:
-                    rootView = inflater.inflate(R.layout.currency_layout, container, false);
+                    rootView = inflater.inflate(R.layout.currency_graph_layout, container, false);
                     CurrencyActivity.setupCandleStickChart(rootView);
-
-//                    TextView costText = rootView.findViewById(R.id.costText);
-//                    costText.setText(Float.toString(CurrencyActivity.currency.currentCost()));
-//                    TextView profitText = rootView.findViewById(R.id.profitText);
-//                    profitText.setText(Float.toString(CurrencyActivity.currency.profit()));
                     break;
                 case 2:
+                    rootView = inflater.inflate(R.layout.currency_overview_layout, container, false);
+                    TextView amountText = rootView.findViewById(R.id.currencyAmountText);
+                    amountText.setText(Float.toString(CurrencyActivity.currency.currentAmount()));
+                    TextView costText = rootView.findViewById(R.id.currencyCostText);
+                    costText.setText(String.format("%.0f$", CurrencyActivity.currency.currentCost()));
+                    TextView profitText = rootView.findViewById(R.id.currencyProfitText);
+                    profitText.setText(String.format("%.0f%%", currency.profit(Period.ALL) * 100));
+                    TextView dailyChangeText = rootView.findViewById(R.id.dailyChangeText);
+                    dailyChangeText.setText(String.format("%.0f%%", currency.dailyChange() * 100));
+
+                    Button deleteButton = rootView.findViewById(R.id.deleteCurrencyButton);
+                    deleteButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            portfolio.currencies.remove(currency);
+                            SplashActivity.savePortfolios(getActivity());
+//                            Intent intent = new Intent(getContext(), PortfolioActivity.class);
+//                            intent.putExtra("Id", portfolioId);
+//                            startActivity(intent);
+                            getActivity().finish();
+                        }
+                    });
+                    break;
+                case 3:
                     rootView = inflater.inflate(R.layout.transaction_layout, container, false);
                     ListView transactionsList = rootView.findViewById(R.id.transactionsList);
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
+                    final ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                             android.R.layout.simple_list_item_1, currency.getTransactions());
                     transactionsList.setAdapter(adapter);
 
@@ -230,26 +275,53 @@ public class CurrencyActivity extends AppCompatActivity {
                             builder.setTitle("Edit transaction");
 
                             final Transaction transaction = currency.transactions.get(position);
-                            View dialogView = inflater.inflate(R.layout.dialog_edit_transaction, null);
-                            final EditText editAmountText = dialogView.findViewById(R.id.editAmountText);
-                            editAmountText.setText(Float.toString(transaction.amount));
-                            final EditText editDateText = dialogView.findViewById(R.id.editDateText);
-                            editDateText.setText(Long.toString(transaction.date));
+                            View dialogView = inflater.inflate(R.layout.dialog_new_transaction, null);
+
+                            final DatePicker datePicker = dialogView.findViewById(R.id.newDatePicker);
+                            Date date = transaction.getDateObject();
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.setTimeInMillis(transaction.date * 1000);
+                            int year = calendar.get(Calendar.YEAR);
+                            int month = calendar.get(Calendar.MONTH);
+                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                            datePicker.updateDate(year, month, day);
+
+                            final EditText editAmountText = dialogView.findViewById(R.id.newAmountText);
+                            editAmountText.setText(Float.toString(Math.abs(transaction.amount)));
+
+                            final RadioButton buyRadio = dialogView.findViewById(R.id.buyRadio);
+                            final RadioButton sellRadio = dialogView.findViewById(R.id.sellRadio);
+                            if (transaction.amount < 0) {
+                                buyRadio.setChecked(false);
+                                sellRadio.setChecked(true);
+                            }
 
                             builder.setView(dialogView);
                             builder.setPositiveButton(R.string.edit, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    long newDate = Long.parseLong(editDateText.getText().toString());
+                                    long newDate = getUnixTime(datePicker);
                                     float newAmount = Float.parseFloat(editAmountText.getText().toString());
-                                    transaction.amount = newAmount;
-                                    transaction.date = newDate;
+                                    if (sellRadio.isChecked()) {
+                                        newAmount *= -1;
+                                    }
+                                    Transaction newTransaction = new Transaction(newDate, newAmount);
+                                    currency.replaceTransaction(transaction, newTransaction);
+                                    adapter.notifyDataSetChanged();
+                                    Activity currentActivity = getActivity();
+                                    SplashActivity.savePortfolios(currentActivity);
+                                    currentActivity.recreate();
                                 }
                             });
                             builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    currency.transactions.remove(position);
+                                    currency.removeTransaction(transaction);
+                                    SplashActivity.savePortfolios(getActivity());
+                                    adapter.notifyDataSetChanged();
+                                    Activity currentActivity = getActivity();
+                                    SplashActivity.savePortfolios(currentActivity);
+                                    currentActivity.recreate();
                                 }
                             });
                             AlertDialog dialog = builder.create();

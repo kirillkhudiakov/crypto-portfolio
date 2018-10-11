@@ -26,10 +26,12 @@ public class MainActivity extends AppCompatActivity {
     static ArrayList<Portfolio> portfolios;
     static ArrayList<String> names;
     ArrayAdapter<String> adapter;
+    boolean justCreated;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        justCreated = true;
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -65,6 +67,19 @@ public class MainActivity extends AppCompatActivity {
         });
 
         fill();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        justCreated = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!justCreated)
+            recreate();
     }
 
     static ArrayList<String> getNames() {

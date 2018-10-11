@@ -16,6 +16,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,7 +25,9 @@ import android.view.ViewGroup;
 
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -58,13 +61,18 @@ public class PortfolioActivity extends AppCompatActivity {
     private ViewPager mViewPager;
 
     static Portfolio portfolio;
+    static Period period;
     static int portfolioId;
     static CandleStickChart chart;
+    boolean justCreated = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        justCreated = true;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_portfolio);
+
+        Log.d("KIRILL", "PORTFOLIO ACTIVITY CREATED");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -84,7 +92,9 @@ public class PortfolioActivity extends AppCompatActivity {
         int id = getIntent().getIntExtra("Id", -1);
         portfolioId = id;
         portfolio = MainActivity.portfolios.get(id);
+        portfolio.getTimeStamps();
 
+        period = Period.MONTH;
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,10 +127,26 @@ public class PortfolioActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("KIRILL", "PORTFOLIO ACTIVITY PAUSED");
+        justCreated = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("KIRILL", "PORTFOLIO ACTIVITY RESUMED");
+        if (!justCreated) {
+            recreate();
+        }
+    }
+
     static void setupCandleStickChart(View rootView) {
         chart = rootView.findViewById(R.id.portfolioChart);
 
-        ArrayList<CandleEntry> entries = portfolio.monthEntries();
+        ArrayList<CandleEntry> entries = portfolio.getEntries(period);
         CandleDataSet dataSet = new CandleDataSet(entries, "The Chort");
         dataSet.setColor(Color.rgb(80, 80, 80));
         dataSet.setShadowColor(Color.DKGRAY);
@@ -134,6 +160,32 @@ public class PortfolioActivity extends AppCompatActivity {
         CandleData data = new CandleData(dataSet);
         chart.setData(data);
         chart.invalidate();
+    }
+
+    public void onRadioButtonClicked(View view) {
+        boolean checked = ((RadioButton) view).isChecked();
+
+        switch (view.getId()) {
+            case R.id.radio_portfolio_month:
+                if (checked)
+                    period = Period.MONTH;
+                break;
+            case R.id.radio_portfolio_half_year:
+                if (checked)
+                    period = Period.HALF_YEAR;
+                break;
+            case R.id.radio_portfolio_year:
+                if (checked)
+                    period = Period.YEAR;
+                break;
+            case R.id.radio_portfolio_all:
+                if (checked)
+                    period = Period.ALL;
+                break;
+        }
+
+        setupCandleStickChart(view.getRootView().getRootView());
+        chart.notifyDataSetChanged();
     }
 
     static PieChart setupPieChart(Context context) {
@@ -205,7 +257,7 @@ public class PortfolioActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
 
-            View rootView= inflater.inflate(R.layout.portfolio_overview, container, false);
+            View rootView= inflater.inflate(R.layout.portfolio_graph, container, false);
 
             if (portfolio.isEmpty()) {
                 return inflater.inflate(R.layout.empty_porfolio_layout, container, false);
@@ -213,15 +265,31 @@ public class PortfolioActivity extends AppCompatActivity {
 
             switch (getArguments().getInt(ARG_SECTION_NUMBER)) {
                 case 1:
-                    rootView = inflater.inflate(R.layout.portfolio_overview, container, false);
-                    TextView costText = rootView.findViewById(R.id.costText);
-                    costText.setText(Float.toString(PortfolioActivity.portfolio.getCost()));
-                    TextView profitText = rootView.findViewById(R.id.profitText);
-                    profitText.setText(Float.toString(PortfolioActivity.portfolio.getProfit()));
-
+                    rootView = inflater.inflate(R.layout.portfolio_graph, container, false);
                     PortfolioActivity.setupCandleStickChart(rootView);
                     break;
                 case 2:
+                    rootView = inflater.inflate(R.layout.portfolio_overview, container, false);
+                    TextView costText = rootView.findViewById(R.id.portfolioCostText);
+                    TextView monthProfit = rootView.findViewById(R.id.porfolioMonthProfitText);
+                    TextView annualProfit = rootView.findViewById(R.id.porfolioAnnualProfitText);
+                    TextView allTimeProfit = rootView.findViewById(R.id.porfolioAllTimeProfitText);
+                    costText.setText(String.format("%.0f$", portfolio.getCost()));
+                    monthProfit.setText(String.format("%.0f%%", portfolio.getProfit(Period.MONTH) * 100));
+                    annualProfit.setText(String.format("%.0f%%", portfolio.getProfit(Period.YEAR) * 100));
+                    allTimeProfit.setText(String.format("%.0f%%", portfolio.getProfit(Period.ALL) * 100));
+
+                    Button deletePortfolioButton = rootView.findViewById(R.id.deletePortfolioButton);
+                    deletePortfolioButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            MainActivity.portfolios.remove(portfolio);
+                            SplashActivity.savePortfolios(getContext());
+                            getActivity().finish();
+                        }
+                    });
+                    break;
+                case 3:
                     rootView = inflater.inflate(R.layout.composition_layout, container, false);
 
                     ListView listView = rootView.findViewById(R.id.compositionList);

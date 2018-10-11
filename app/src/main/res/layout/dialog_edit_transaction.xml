@@ -35,6 +35,7 @@
     <EditText
         android:id="@+id/editAmountText"
         android:hint="Amount"
+        android:inputType="numberDecimal"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="@id/editAmountLabel"

@@ -24,8 +24,6 @@ public class SplashActivity extends AppCompatActivity {
             public void run() {
                 try {
                     super.run();
-                    configurePortfolios();
-                    savePortfolios();
                     if (!App.info.ready()) {
                         App.info.updateQuotations();
                         while (!App.info.ready()) {
@@ -33,6 +31,8 @@ public class SplashActivity extends AppCompatActivity {
                         }
                         writeData();
                     }
+                    configurePortfolios();
+                    savePortfolios();
                 } catch (Exception e) {
                     Log.d("Kirill", e.getMessage());
                 } finally {
@@ -113,9 +113,9 @@ public class SplashActivity extends AppCompatActivity {
         splashThread.start();
     }
 
-    static void savePortfolios(Activity activity) {
+    static void savePortfolios(Context context) {
         try {
-            FileOutputStream fos = activity.openFileOutput("Portfolios", Context.MODE_PRIVATE);
+            FileOutputStream fos = context.openFileOutput("Portfolios", Context.MODE_PRIVATE);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(MainActivity.portfolios);
             oos.close();

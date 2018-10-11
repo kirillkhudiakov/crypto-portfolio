@@ -4,17 +4,36 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/newDateText"
-        android:hint="Date"
-        android:layout_width="160dp"
-        android:layout_height="wrap_content" />
+    <DatePicker
+        android:id="@+id/newDatePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:datePickerMode="spinner"
+        android:calendarViewShown="false"/>
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/buyRadio"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="Buy"
+            android:checked="true"/>
+        <RadioButton
+            android:id="@+id/sellRadio"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="Sell"/>
+    </RadioGroup>a
 
     <EditText
         android:id="@+id/newAmountText"
         android:hint="Amount"
         android:layout_marginTop="20dp"
         android:layout_width="160dp"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"/>
 
 </LinearLayout>

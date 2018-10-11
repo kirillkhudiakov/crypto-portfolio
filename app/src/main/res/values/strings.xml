@@ -25,4 +25,10 @@
         <item>MIOTA</item>
         <item>TRX</item>
     </string-array>
+    
+    <string-array name="tradeType">
+        <item>Buy</item>
+        <item>Sell</item>
+    </string-array>
+    
 </resources>
