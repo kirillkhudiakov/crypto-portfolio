@@ -24,43 +24,43 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@+id/portfolioCostLabel"/>
 
-    <TextView
-        android:textSize="25sp"
-        android:text="Monthly Profit"
-        android:id="@+id/portfolioMonthProfitLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/portfolioCostLabel"
-        android:layout_marginTop="30dp"/>
+    <!--<TextView-->
+        <!--android:textSize="25sp"-->
+        <!--android:text="Monthly Profit"-->
+        <!--android:id="@+id/portfolioMonthProfitLabel"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/portfolioCostLabel"-->
+        <!--android:layout_marginTop="30dp"/>-->
 
-    <TextView
-        android:textStyle="bold"
-        android:textSize="25sp"
-        android:id="@+id/porfolioMonthProfitText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/portfolioMonthProfitLabel" />
+    <!--<TextView-->
+        <!--android:textStyle="bold"-->
+        <!--android:textSize="25sp"-->
+        <!--android:id="@+id/porfolioMonthProfitText"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintBottom_toBottomOf="@+id/portfolioMonthProfitLabel" />-->
 
-    <TextView
-        android:textSize="25sp"
-        android:id="@+id/portfolioAnnualProfitLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/portfolioMonthProfitLabel"
-        android:layout_marginTop="30dp"
-        android:text="Annual Profit:"/>
+    <!--<TextView-->
+        <!--android:textSize="25sp"-->
+        <!--android:id="@+id/portfolioAnnualProfitLabel"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toBottomOf="@id/portfolioMonthProfitLabel"-->
+        <!--android:layout_marginTop="30dp"-->
+        <!--android:text="Annual Profit:"/>-->
 
-    <TextView
-        android:textStyle="bold"
-        android:textSize="25sp"
-        android:id="@+id/porfolioAnnualProfitText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/portfolioAnnualProfitLabel" />
+    <!--<TextView-->
+        <!--android:textStyle="bold"-->
+        <!--android:textSize="25sp"-->
+        <!--android:id="@+id/porfolioAnnualProfitText"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintBottom_toBottomOf="@+id/portfolioAnnualProfitLabel" />-->
 
     <TextView
         android:textSize="25sp"
@@ -68,9 +68,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/portfolioAnnualProfitLabel"
+        app:layout_constraintTop_toBottomOf="@id/portfolioCostLabel"
         android:layout_marginTop="30dp"
-        android:text="All Time Profit:"/>
+        android:text="Profit:"/>
 
     <TextView
         android:textStyle="bold"

@@ -271,12 +271,12 @@ public class PortfolioActivity extends AppCompatActivity {
                 case 2:
                     rootView = inflater.inflate(R.layout.portfolio_overview, container, false);
                     TextView costText = rootView.findViewById(R.id.portfolioCostText);
-                    TextView monthProfit = rootView.findViewById(R.id.porfolioMonthProfitText);
-                    TextView annualProfit = rootView.findViewById(R.id.porfolioAnnualProfitText);
+//                    TextView monthProfit = rootView.findViewById(R.id.porfolioMonthProfitText);
+//                    TextView annualProfit = rootView.findViewById(R.id.porfolioAnnualProfitText);
                     TextView allTimeProfit = rootView.findViewById(R.id.porfolioAllTimeProfitText);
                     costText.setText(String.format("%.0f$", portfolio.getCost()));
-                    monthProfit.setText(String.format("%.0f%%", portfolio.getProfit(Period.MONTH) * 100));
-                    annualProfit.setText(String.format("%.0f%%", portfolio.getProfit(Period.YEAR) * 100));
+//                    monthProfit.setText(String.format("%.0f%%", portfolio.getProfit(Period.MONTH) * 100));
+//                    annualProfit.setText(String.format("%.0f%%", portfolio.getProfit(Period.YEAR) * 100));
                     allTimeProfit.setText(String.format("%.0f%%", portfolio.getProfit(Period.ALL) * 100));
 
                     Button deletePortfolioButton = rootView.findViewById(R.id.deletePortfolioButton);
