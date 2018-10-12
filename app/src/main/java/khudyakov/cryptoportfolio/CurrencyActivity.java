@@ -172,7 +172,7 @@ public class CurrencyActivity extends AppCompatActivity {
         dataSet.setDecreasingColor(Color.RED);
         dataSet.setDecreasingPaintStyle(Paint.Style.FILL);
         dataSet.setIncreasingColor(Color.rgb(122, 242, 84));
-        dataSet.setIncreasingPaintStyle(Paint.Style.STROKE);
+        dataSet.setIncreasingPaintStyle(Paint.Style.FILL);
         dataSet.setNeutralColor(Color.BLUE);
         dataSet.setValueTextColor(Color.RED);
         CandleData data = new CandleData(dataSet);

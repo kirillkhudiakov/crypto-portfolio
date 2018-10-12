@@ -77,7 +77,7 @@ public class SplashActivity extends AppCompatActivity {
                     xrp.addTransaction(new Transaction(1532995200, 5));
                     bch.addTransaction(new Transaction(1532995200, 1));
 
-                    Portfolio portfolio1 = new Portfolio("Kotleta1");
+                    Portfolio portfolio1 = new Portfolio("Main Portfolio");
                     portfolio1.addCurrency(btc);
                     portfolio1.addCurrency(eth);
                     portfolio1.addCurrency(xrp);
@@ -89,7 +89,7 @@ public class SplashActivity extends AppCompatActivity {
                     portfolio2.addCurrency(btc);
                     MainActivity.portfolios.add(portfolio2);
 
-                    Portfolio portfolio3 = new Portfolio("BCH and ETH");
+                    Portfolio portfolio3 = new Portfolio("Alternative Portfolio");
                     portfolio3.addCurrency(bch);
                     portfolio3.addCurrency(eth);
                     MainActivity.portfolios.add(portfolio3);

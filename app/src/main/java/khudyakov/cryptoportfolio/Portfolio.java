@@ -56,7 +56,7 @@ public class Portfolio implements Serializable {
     String[] getComposition() {
         String[] composition = new String[currencies.size()];
         for (int i = 0; i < composition.length; i++) {
-            String weight = Float.toString(currencies.get(i).currentCost() / getCost());
+            String weight = String.format("%.0f%%", currencies.get(i).currentCost() * 100 / getCost());
             composition[i] = currencies.get(i).name + "\t" + weight;
         }
         return composition;

@@ -85,7 +85,10 @@ public class MainActivity extends AppCompatActivity {
     static ArrayList<String> getNames() {
         ArrayList<String> names = new ArrayList<>();
         for (Portfolio portfolio: portfolios) {
-            names.add(portfolio.name);
+            float profit = portfolio.getProfit(Period.MONTH);
+            String sign = profit >= 0 ? "+" : "-";
+            names.add(String.format("%s %s%.0f%%",
+                    portfolio.name, sign, portfolio.getProfit(Period.MONTH) * 100));
         }
         return names;
     }
